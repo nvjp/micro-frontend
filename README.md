@@ -39,14 +39,14 @@ exposes: {
 Shell app.routes.ts:
 
 {
-  path: 'header',
-  loadComponent: () =>
-    loadRemoteModule({
-      type: 'module',
-      remoteEntry: 'http://localhost:4201/remoteEntry.js',
-      exposedModule: './Component',
-    }).then(m => m.AppComponent),
-}
+    path: 'header',
+    loadComponent: () =>
+      loadRemoteModule({
+        type: 'module',
+        remoteEntry: 'http://localhost:4201/remoteEntry.js',
+        exposedModule: './Component', // AppComponent from mfe-header
+      }).then((m) => m.AppComponent),
+  },
 
 🧪 Test It
 
