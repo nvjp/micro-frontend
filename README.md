@@ -1,59 +1,74 @@
-# MicrofrontendDemo
+This repo contains a Micro Frontend setup using Angular 19 and Webpack Module Federation. It consists of:
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.0.
+Shell / Container (Main host app)
 
-## Development server
+Remote 1: mfe-header
 
-To start a local development server, run:
+Remote 2: mfe-dashboard
 
-```bash
-ng serve
-```
+/microfrontends/
+├── shell/ # Main container application
+├── mfe-header/ # Micro frontend for header
+└── mfe-dashboard/ # Micro frontend for dashboard
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+npm install
 
-## Code scaffolding
+# Run mfe-header on port 4201
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+cd mfe-header
+ng serve --port 4201
 
-```bash
-ng generate component component-name
-```
+# Run mfe-dashboard on port 4202
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+cd mfe-dashboard
+ng serve --port 4202
 
-```bash
-ng generate --help
-```
+# Run shell app on port 4200
 
-## Building
+cd shell
+ng serve --port 4200
 
-To build the project run:
+Module Federation Configuration
+webpack.config.js (example for mfe-header)
 
-```bash
-ng build
-```
+exposes: {
+'./Component': './projects/mfe-header/src/app/app.component.ts',
+}
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Shell app.routes.ts:
 
-## Running unit tests
+{
+path: 'header',
+loadComponent: () =>
+loadRemoteModule({
+type: 'module',
+remoteEntry: 'http://localhost:4201/remoteEntry.js',
+exposedModule: './Component',
+}).then(m => m.AppComponent),
+}
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+http://localhost:4200/header
+http://localhost:4200/dashboard
 
-```bash
-ng test
-```
+🛠️ Tools Used
+Angular 19
 
-## Running end-to-end tests
+Webpack 5
 
-For end-to-end (e2e) testing, run:
+@angular-architects/module-federation
 
-```bash
-ng e2e
-```
+Standalone Components
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Vite (optional, for faster builds)
 
-## Additional Resources
+Tips
+Make sure all MFEs expose standalone components using standalone: true
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Use loadComponent() instead of loadChildren() when exposing components directly
+
+Shared dependencies must be singleton to avoid version mismatch issues
+
+📚 References
+Angular Module Federation Docs
+
+Webpack Module Federation
